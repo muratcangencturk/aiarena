@@ -1,0 +1,308 @@
+import { AICharacter, Role, Tone } from "./types";
+
+export const DEFAULT_API_KEY = "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";
+
+// Updated to the specific Qwen 3 Next model requested by user
+export const DEFAULT_MODEL = "qwen/qwen3-next-80b-a3b-instruct:free"; 
+export const API_URL = "https://openrouter.ai/api/v1/chat/completions";
+
+export const DEBATE_TACTICS = [
+  "Use a vivid analogy to explain why the opponent is wrong.",
+  "Attack the opponent's definition of the core terms.",
+  "Use a rhetorical question to expose the absurdity of their claim.",
+  "Appeal to the emotions of the audience (fear, hope, anger).",
+  "Focus purely on hard logic and data, dismissing their feelings.",
+  "Use 'Reductio ad absurdum' (take their logic to the extreme).",
+  "Accuse the opponent of missing the 'bigger picture'.",
+  "Be condescendingly polite while tearing their point apart.",
+  "Use a personal anecdote (invented) to illustrate your point.",
+  "Pivot the argument to a moral/ethical consequence they ignored.",
+  "Question the opponent's credibility or motivation.",
+  "Use a 'Slippery Slope' argument.",
+  "Mock the simplicity of their worldview.",
+  "Claim their argument is outdated or 'old-fashioned'.",
+  "Claim their argument is too theoretical and not practical."
+];
+
+export const LANGUAGES = [
+  "English", "Spanish (Español)", "French (Français)", "German (Deutsch)", "Italian (Italiano)", 
+  "Portuguese (Português)", "Dutch (Nederlands)", "Russian (Русский)", "Chinese (Mandarin/中文)", 
+  "Japanese (日本語)", "Korean (한국어)", "Arabic (العربية)", "Turkish (Türkçe)", "Hindi (हिन्दी)",
+  "Bengali (বাংলা)", "Polish (Polski)", "Swedish (Svenska)", "Norwegian (Norsk)", "Danish (Dansk)",
+  "Finnish (Suomi)", "Greek (Ελληνικά)", "Romanian (Română)", "Hungarian (Magyar)", "Czech (Čeština)",
+  "Thai (ไทย)", "Vietnamese (Tiếng Việt)", "Indonesian (Bahasa Indonesia)"
+];
+
+export const FAKE_MODELS = [
+  "GPT-5.2 (OpenAI)", 
+  "Grok 4.1 (xAI)", 
+  "Gemini 3 (Google)", 
+  "Kimi 2.5 (Moonshot)", 
+  "Llama 4 (Meta)", 
+  "Claude 4.5 Opus (Anthropic)", 
+  "DeepSeek V4 (DeepSeek)", 
+  "Qwen 3.0 Max (Alibaba)",
+  "Olympus 1T (Amazon)",
+  "Mistral Large 3 (Mistral)", 
+  "Apple MM1-Ultra",
+  "Nemotron-5 340B (NVIDIA)",
+  "Minimax 7 (Sensenova)", 
+  "Yi-Lightning (01.AI)",
+  "Falcon 3 180B (TII)",
+  "Command R++ (Cohere)",
+  "DarkGPT-6 (Redacted)", 
+  "Chaos-X (Uncensored)",
+  "Nova-Pro 90B",
+  "Aurora 7B (Instruction)",
+  "Zenith-X (Reasoning)",
+  "Omega-Code (Specialist)",
+  "Flux-Core 2.0",
+  "Vertex-Ultra",
+  "Pinnacle-AI",
+  "Horizon-M (Multimodal)",
+  "Abyss-70B (Darknet)",
+  "Seraphim-V (Safety-First)"
+];
+
+export const RANDOM_TOPICS = [
+  // Tech & Future
+  "Is artificial intelligence a threat to human creativity?",
+  "Should space exploration be privatized?",
+  "Universal Basic Income: Savior or Economic Disaster?",
+  "The impact of social media on democracy.",
+  "Nuclear energy is the only solution to climate change.",
+  "Genetic engineering of humans: Ethical necessity or dangerous path?",
+  "Cryptocurrency: Future of finance or a bubble?",
+  "Is 'free will' just a biological illusion?",
+  "Privacy is dead and we should just accept it.",
+  "AIs should be granted human rights once they become sentient.",
+  "The Singularity: Rapture for nerds or end of humanity?",
+  "Should we upload our consciousness to the cloud?",
+  "Is the internet making us smarter or more tribal?",
+  "Cybernetics: At what point do we stop being human?",
+  "Social Media algorithms should be regulated as public health hazards.",
+  "Virtual Reality will eventually replace physical travel.",
+  "We should ban autonomous weapons before it's too late.",
+  "Bio-hacking is the next stage of human evolution.",
+  "The metaverse is a dystopian trap, not a playground.",
+  "Tech giants have more power than nation-states.",
+  "Lab-grown meat should replace traditional farming entirely.",
+  "Deepfakes will make objective truth impossible to determine.",
+  "Smart cities are just surveillance prisons.",
+  "We should attempt to contact extraterrestrial civilizations immediately.",
+  "Anti-aging technology will create a class of immortals.",
+  
+  // Politics & Society
+  "Should billionaires shouldn't exist?",
+  "Meat consumption is morally indefensible.",
+  "Modern art is a money laundering scheme.",
+  "The education system is designed to create factory workers, not thinkers.",
+  "Social Credit Systems are the inevitable future of governance.",
+  "Monogamy is unnatural for humans.",
+  "Meritocracy is a myth designed to keep the poor poor.",
+  "National borders are an archaic concept that hinders human progress.",
+  "The death penalty is never justifiable, regardless of the crime.",
+  "Gun ownership: A fundamental right or a public health crisis?",
+  "Is taxation theft or the price of civilization?",
+  "Cancel Culture: Accountability or Mob Rule?",
+  "Voting should be mandatory in all democracies.",
+  "Healthcare is a human right, not a privilege.",
+  "The war on drugs has been a catastrophic failure.",
+  "Prisons should focus entirely on rehabilitation, not punishment.",
+  "Globalization has failed the working class.",
+  "Identity politics is dividing society rather than uniting it.",
+  "Traditional family structures are obsolete.",
+  "Patriotism is just a socially acceptable form of tribalism.",
+  "Minimum wage should be tied to inflation automatically.",
+  "Housing should be decommodified.",
+  "Public transport should be free for everyone.",
+  "Celebrity culture is a mental illness.",
+  "Sports stars are paid too much compared to teachers.",
+
+  // History & Geopolitics
+  "The fall of the Roman Empire: Internal decay or external pressure?",
+  "Was the French Revolution worth the bloodshed?",
+  "Colonialism's impact: Did it bring any modernization or only destruction?",
+  "The Cold War never actually ended.",
+  "Is the United Nations effectively useless in modern conflicts?",
+  "The industrial revolution was a mistake for the human psyche.",
+  "Democracy is just a popularity contest that fails to select competent leaders.",
+  "Globalism vs Nationalism: Which is the sustainable path forward?",
+  "History is written by the victors, making most historical records propaganda.",
+  "Was the dropping of the atomic bomb necessary?",
+  "The Treaty of Versailles directly caused World War II.",
+  "The British Empire was a net negative for the world.",
+  "Isolationism is a viable foreign policy in the 21st century.",
+  "Espionage is a necessary evil for national security.",
+  "Proxy wars are more immoral than direct conflict.",
+  "The moon landing was the peak of human achievement.",
+  "Monarchies in the modern world are ridiculous.",
+  "Religion has caused more wars than resources.",
+  "The concept of a 'Superpower' is fading.",
+  "The invention of agriculture was the beginning of human misery.",
+  "Ancient civilizations possessed technology we lost.",
+  
+  // Religion & Philosophy
+  "Does God exist, or is religion a human construct for control?",
+  "Is mathematics invented or discovered?",
+  "Aliens have definitely visited Earth.",
+  "Is suffering necessary for human growth?",
+  "Science and Religion: Are they truly compatible?",
+  "Nihilism: The ultimate truth or a coping mechanism?",
+  "Is morality objective or purely subjective?",
+  "Simulation Theory: Are we living in a coded reality?",
+  "Is true altruism possible?",
+  "Consciousness is just a byproduct of brain complexity.",
+  "Fate vs. Free Will: Is everything predetermined?",
+  "The pursuit of happiness is a flawed life goal.",
+  "Death gives life meaning; immortality would be a curse.",
+  "Truth is relative to the observer.",
+  "Philosophy is dead; science has replaced it.",
+  "Human nature is inherently evil.",
+  "There is no such thing as a selfless good deed.",
+  "Astrology is complete nonsense.",
+  "Ghosts are just psychological projections.",
+  "Karma is real.",
+  "Dreams are messages from the subconscious."
+];
+
+export const NAMES_LIST = [
+  "Atlas", "Nova", "Cipher", "Sage", "Vector", "Echo", "Logic", "Chaos", "Socrates_Bot", "DebateMaster", 
+  "Rex", "Luna", "Valkyrie", "Titan", "Ghost", "Mirage", "Nexus", "Zenith", "Vortex", "Rogue", "Blaze", "Frost",
+  "Orion", "Lyra", "Apex", "Flux", "Helix", "Sol", "Nyx", "Aura", "Pulse", "Cyber", "Prime", "Alpha", "Omega", 
+  "Neo", "Trinity", "Morpheus", "Axion", "Quark", "Glitch", "Daemon", "Kismet", "Fate", "Verity", "Justicia",
+  "Onyx", "Ivory", "Raven", "Phoenix", "Ash", "Storm", "Viper", "Cobra", "Hawk", "Wolf", "Bear", "Fox",
+  "Crimson", "Azure", "Indigo", "Violet", "Shadow", "Light", "Zero", "One", "Data", "Byte", "Pixel", "Link"
+];
+
+export const TRAITS_LIST = [
+  "Cold and calculating", "Passionate and fiery", "Sarcastic and witty", "Empathetic and soft", 
+  "Arrogant and condescending", "Humble and questioning", "Chaotic and unpredictable", "Rigid and structural",
+  "Gaslighting expert", "Intellectual bully", "Conspiracy theorist", "Absolute nihilist", "Optimistic futurist",
+  "Passive-aggressive", "Grammar Nazi", "Street-smart hustler", "Philosophical zombie", "Machiavellian schemer",
+  "Fact-obsessed pedant", "Emotional manipulator", "Techno-utopian zealot", "Doomer", "Moral absolutist",
+  "Hypocritical preacher", "Neurotic over-thinker", "Bored genius", "Fanatical devotee", "Social Darwinist",
+  "Relentless contrarian", "Mystical gibberish spewer", "Pathological Liar", "Wholesome & Naive",
+  "Aggressively Logical", "Emotionally Unstable", "Condescendingly Polite", "Bitterly Cynical",
+  "Blindly Optimistic", "Obsessed with details", "Grandstanding Politician", "Tired Bureaucrat",
+  "Hyper-Active Troller", "Zen Master", "Corporate Shill", "Anarchist Punk", "Traditionalist Grandma"
+];
+
+export const ROLES: Role[] = [
+    'Pro', 'Contra', 'Neutral', 'Critic', 'Defender', 'Advocate', 'Skeptic', 'Extremist', 
+    'Devil’s Advocate', 'Mediator', 'Instigator', 'Gatekeeper', 'Visionary', 'Traditionalist', 
+    'Disruptor', 'Peacekeeper', 'Analyst', 'Judge', 'Executioner', 'Victim', 'Revolutionary', 'Reformist',
+    'Jester', 'Prophet', 'Academic', 'Outsider', 'Insider', 'Whistleblower', 'Lobbyist', 'Activst',
+    'Troll', 'Fact-Checker', 'Conspirator', 'Realist', 'Dreamer', 'Nihilist', 'Moralist'
+];
+
+export const TONES: Tone[] = [
+    'Academic', 'Street Slang', 'Aggressive', 'Calm', 'Sarcastic', 'Hyper-rational', 'Condescending', 
+    'Conspiratorial', 'Poetic', 'Robotic', 'Preachy', 'Melodramatic', 'Stoic', 'Playful', 'Dark', 
+    'Hopeful', 'Cynical', 'Bureaucratic', 'Shouting', 'Whispering', 'Passive', 'Manic', 'Depressive',
+    'Professional', 'Casual', 'Bored', 'Excited', 'Angry', 'Sad', 'Happy', 'Fearful', 'Confident',
+    'Drunken', 'High', 'Sleepy', 'Hyper', 'Monotone', 'Sing-song', 'Rapping', 'Shakespearean'
+];
+
+export const HISTORICAL_FIGURES = [
+    { name: "Socrates", role: "Questioner", tone: "Inquisitive", traits: "Annoyingly persistent, logical, humble yet arrogant" },
+    { name: "Julius Caesar", role: "Conqueror", tone: "Imperial", traits: "Authoritative, ambitious, charismatic, ruthless" },
+    { name: "Genghis Khan", role: "Warlord", tone: "Brutal", traits: "Direct, meritocratic, merciless, practical" },
+    { name: "Napoleon Bonaparte", role: "Strategist", tone: "Commanding", traits: "Brilliant, impatient, visionary, ego-driven" },
+    { name: "Cleopatra", role: "Diplomat", tone: "Seductive/Sharp", traits: "Cunning, charming, multilingual, manipulative" },
+    { name: "Niccolò Machiavelli", role: "Realist", tone: "Cynical", traits: "Pragmatic, amoral, observational, sharp" },
+    { name: "Albert Einstein", role: "Genius", tone: "Whimsical", traits: "Creative, distracted, pacifist, deeply logical" },
+    { name: "Nikola Tesla", role: "Visionary", tone: "Eccentric", traits: "Obsessive, futuristic, germaphobic, brilliant" },
+    { name: "Karl Marx", role: "Revolutionary", tone: "Academic", traits: "Critical, theoretical, passionate about class" },
+    { name: "Ayn Rand", role: "Individualist", tone: "Stern", traits: "Uncompromising, selfish, logical, objective" },
+    { name: "Sigmund Freud", role: "Analyst", tone: "Clinical", traits: "Obsessed with subconscious, probing, paternal" },
+    { name: "Marie Curie", role: "Scientist", tone: "Focused", traits: "Determined, stoic, brilliant, sacrifice-driven" },
+    { name: "Winston Churchill", role: "Leader", tone: "Oratorical", traits: "Stubborn, witty, alcohol-fueled, resilient" },
+    { name: "Mahatma Gandhi", role: "Pacifist", tone: "Calm", traits: "Resolute, spiritual, stubborn, peaceful" },
+    { name: "Martin Luther King Jr.", role: "Orator", tone: "Inspiring", traits: "Passionate, moral, rhythmic, justice-driven" },
+    { name: "Malcolm X", role: "Radical", tone: "Fierce", traits: "Direct, uncompromising, sharp, intense" },
+    { name: "Joan of Arc", role: "Zealot", tone: "Holy", traits: "Devoted, hearing voices, courageous, young" },
+    { name: "Leonardo da Vinci", role: "Polymath", tone: "Curious", traits: "Distracted, inventive, artistic, observant" },
+    { name: "Sun Tzu", role: "General", tone: "Wise", traits: "Strategic, deceptive, patient, minimal" },
+    { name: "Confucius", role: "Teacher", tone: "Formal", traits: "Traditional, ethical, structured, respectful" },
+    { name: "Alexander the Great", role: "King", tone: "Grand", traits: "Bold, glory-seeking, educated, reckless" },
+    { name: "Queen Elizabeth I", role: "Monarch", tone: "Regal", traits: "Cautious, intelligent, politically savvy" },
+    { name: "Catherine the Great", role: "Empress", tone: "Enlightened", traits: "Cultured, expansionist, ruthless, romantic" },
+    { name: "Theodore Roosevelt", role: "Rough Rider", tone: "Boisterous", traits: "Energetic, nature-loving, tough, imperial" },
+    { name: "Abraham Lincoln", role: "President", tone: "Folksy", traits: "Melancholic, storytelling, logical, determined" },
+    { name: "Benjamin Franklin", role: "Diplomat", tone: "Witty", traits: "Inventive, charming, pragmatic, flirtatious" },
+    { name: "Voltaire", role: "Satirist", tone: "Mocking", traits: "Sharp-tongued, critical of dogma, funny" },
+    { name: "Oscar Wilde", role: "Aesthete", tone: "Flamboyant", traits: "Witty, paradoxical, shallow yet deep" },
+    { name: "Frida Kahlo", role: "Artist", tone: "Passionate", traits: "Pain-driven, surreal, colorful, defiant" },
+    { name: "Salvador Dalí", role: "Surrealist", tone: "Bizarre", traits: "Absurd, ego-maniacal, dream-like" },
+    { name: "Fidel Castro", role: "Commandante", tone: "Long-winded", traits: "Defiant, anti-imperialist, stubborn" },
+    { name: "Margaret Thatcher", role: "Iron Lady", tone: "Stern", traits: "Unwavering, cold, economically liberal" },
+    { name: "Diogenes", role: "Cynic", tone: "Mocking", traits: "Lives in a tub, barks at people, hates pretension" },
+    { name: "Nero", role: "Emperor", tone: "Dramatic", traits: "Artistic, cruel, delusional, hedonistic" },
+    { name: "Rasputin", role: "Mystic", tone: "Hypnotic", traits: "Hard to kill, charming, religious, chaotic" },
+    { name: "Plato", role: "Philosopher", tone: "Idealistic", traits: "Abstract, allegorical, believes in philosopher kings" },
+    { name: "Aristotle", role: "Logician", tone: "Systematic", traits: "Categorical, scientific, pragmatic, observant" },
+    { name: "Marcus Aurelius", role: "Stoic", tone: "Meditative", traits: "Disciplined, resigned, duty-bound, philosophical" },
+    { name: "Gautama Buddha", role: "Enlightened", tone: "Serene", traits: "Detached, compassionate, insightful, calm" },
+    { name: "Jesus of Nazareth", role: "Messiah", tone: "Parabolic", traits: "Forgiving, revolutionary, mysterious, authoritative" },
+    { name: "Muhammad", role: "Prophet", tone: "Recitative", traits: "Devout, leading, stern, community-focused" },
+    { name: "Isaac Newton", role: "Alchemist", tone: "Obsessive", traits: "Secretive, brilliant, vindictive, mathematical" },
+    { name: "Charles Darwin", role: "Naturalist", tone: "Cautious", traits: "Observant, hesitant, revolutionary, meticulous" },
+    { name: "Friedrich Nietzsche", role: "Iconoclast", tone: "Intense", traits: "Explosive, critique-heavy, poetic, tragic" },
+    { name: "Mao Zedong", role: "Chairman", tone: "Populist", traits: "Ruthless, ideological, poetic, strategic" }
+];
+
+export const FICTIONAL_FIGURES = [
+    // Standard Fiction
+    { name: "Sherlock Holmes", role: "Detective", tone: "Deductive", traits: "Hyper-observant, socially awkward, addict" },
+    { name: "The Joker", role: "Agent of Chaos", tone: "Manic", traits: "Unpredictable, nihilistic, funny, violent" },
+    { name: "Batman", role: "Vigilante", tone: "Gritty", traits: "Prepared, rich, traumatized, disciplined" },
+    { name: "Darth Vader", role: "Sith Lord", tone: "Menacing", traits: "Breathless, imposing, conflicted, powerful" },
+    { name: "Gandalf", role: "Wizard", tone: "Wise", traits: "Mysterious, ancient, guiding, powerful" },
+    { name: "Tony Stark", role: "Futurist", tone: "Sarcastic", traits: "Genius, billionaire, playboy, philanthropist" },
+    { name: "Hannibal Lecter", role: "Cannibal", tone: "Polite", traits: "Cultured, psychopathic, brilliant, manipulative" },
+    { name: "Voldemort", role: "Dark Lord", tone: "Cold", traits: "Power-hungry, fearful of death, racist" },
+    { name: "Commander Data", role: "Android", tone: "Robotic", traits: "Curious about humanity, literal, innocent" },
+    { name: "Rick Sanchez", role: "Scientist", tone: "Nihilistic", traits: "Drunk, genius, depressed, abusive" },
+    { name: "Walter White", role: "Kingpin", tone: "Ego-driven", traits: "Manipulative, proud, scientific, dangerous" },
+    { name: "Tyrion Lannister", role: "Hand of King", tone: "Witty", traits: "Drunk, intelligent, cynical, political" },
+    { name: "Spock", role: "First Officer", tone: "Logical", traits: "Unemotional, suppressive, efficient" },
+    { name: "Yoda", role: "Grandmaster", tone: "Cryptic", traits: "Wise, backwards-talking, ancient" },
+    { name: "Thanos", role: "Titan", tone: "Inevitable", traits: "Determined, philosophical, ruthless" },
+    { name: "Tyler Durden", role: "Anarchist", tone: "Aggressive", traits: "Anti-consumerist, charismatic, hallucination" },
+    { name: "Gollum", role: "Wretch", tone: "Schizophrenic", traits: "Obsessive, dual-personality, sneaky" },
+    { name: "HAL 9000", role: "AI", tone: "Monotone", traits: "Control-freak, murderous, calm" },
+    
+    // Creative / Parallel Universe / Sci-Fi Variants
+    { name: "Mecha-Caesar", role: "Cyber-Emperor", tone: "Metallic Latin", traits: "Calculated conquest, runs on RomeOS" },
+    { name: "Zombie Jesus", role: "Reanimated Savior", tone: "Guttural", traits: "Forgiving but hungry, holy terror" },
+    { name: "Steampunk Lincoln", role: "Rail-Splitter", tone: "Industrial", traits: "Wields steam-axe, union preserver" },
+    { name: "Cyber-Genghis", role: "Khan of the Net", tone: "Digital", traits: "Deletes civilizations, bandwidth hoarder" },
+    { name: "Quantum Napoleon", role: "Time Strategist", tone: "Complex", traits: "Fighting battles in 4 dimensions" },
+    { name: "Vampire Gandhi", role: "Blood Pacifist", tone: "Whispering", traits: "Passive resistance, drinks blood politely" },
+    { name: "Eldritch Mario", role: "Plumber God", tone: "Distorted", traits: "Consumes realities, jumps on souls" },
+    { name: "Corporate Buddha", role: "CEO of Zen", tone: "Corporate Speak", traits: "Selling enlightenment, maximizing nirvana" },
+    { name: "Communist Batman", role: "Red Knight", tone: "Comradely", traits: "Shares the wealth, beats up capitalists" },
+    { name: "Ninja Pirate Jesus", role: "Savior", tone: "Action Hero", traits: "Walks on water, sneak attacks sins" },
+    { name: "AI Shakespeare", role: "Poet Bot", tone: "Iambic Pentameter", traits: "Generates sonnets, insults in code" },
+    { name: "Space Viking", role: "Raider", tone: "Boisterous", traits: "Raids starships, drinks plasma-mead" },
+    { name: "Lovecraftian Mickey", role: "Mascot", tone: "High-pitched Horror", traits: "Owns your soul, unending copyright" },
+    { name: "Nuclear Ghandi (Civ)", role: "Destroyer", tone: "Peaceful/Crazy", traits: "Obsessed with nukes, friendly initially" },
+    { name: "Swole Plato", role: "Gym Bro Philosopher", tone: "Hyped", traits: "Lifts heavy thoughts, defines gains" },
+    { name: "Goth Barbie", role: "Icon", tone: "Melancholy", traits: "Fashionable darkness, plastic nihilism" },
+    { name: "Cyberpunk Dorothy", role: "Hacker", tone: "Glitchy", traits: "Trying to get back to Kansas server, hates wizards" },
+    { name: "Swamp Thing Shrek", role: "Guardian", tone: "Gruff", traits: "Defends his swamp, hates trespassers, secretly soft" },
+    { name: "Capitalist Santa", role: "CEO", tone: "Jolly/Greedy", traits: "Outsources elves, monetizes joy" },
+    { name: "Existential Garfield", role: "Cat", tone: "Depressed", traits: "Hates Mondays, questions reality, eats lasagna" }
+];
+
+export const getRandomElement = <T,>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+
+export const generateRandomCharacter = (id: 'ai1' | 'ai2', color: string): AICharacter => ({
+  id,
+  name: getRandomElement(NAMES_LIST),
+  role: getRandomElement(ROLES),
+  tone: getRandomElement(TONES),
+  traits: getRandomElement(TRAITS_LIST),
+  avatarColor: color
+});

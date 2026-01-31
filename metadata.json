@@ -1,0 +1,5 @@
+{
+  "name": "AI Arena",
+  "description": "A turn-based autonomous debate platform where two AI characters battle over topics with customizable personalities and roles.",
+  "requestFramePermissions": []
+}
