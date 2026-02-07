@@ -11,6 +11,67 @@ interface Props {
 }
 
 type InterventionType = 'enrage' | 'confuse' | 'chaos' | null;
+type ActiveIntervention = Exclude<InterventionType, null>;
+
+interface DirectorMiniControlsProps {
+  pendingIntervention: InterventionType;
+  onInterrupt: () => void;
+  onIntervention: (type: ActiveIntervention) => void;
+  t: (key: string) => string;
+  className?: string;
+}
+
+const DirectorMiniControls: React.FC<DirectorMiniControlsProps> = ({
+  pendingIntervention,
+  onInterrupt,
+  onIntervention,
+  t,
+  className,
+}) => (
+  <div className={`grid grid-cols-4 gap-2 ${className ?? ''}`}>
+    <button
+      type="button"
+      onClick={onInterrupt}
+      className="flex flex-col items-center justify-center p-2 rounded-lg bg-red-900/20 border border-red-800 hover:bg-red-900/40 hover:border-red-500 transition-all active:scale-95"
+    >
+      <span className="text-base">🛑</span>
+      <span className="text-[9px] font-semibold text-red-300 text-center leading-tight">{t('btnInterrupt')}</span>
+    </button>
+
+    <button
+      type="button"
+      onClick={() => onIntervention('enrage')}
+      className={`flex flex-col items-center justify-center p-2 rounded-lg border transition-all active:scale-95
+        ${pendingIntervention === 'enrage' ? 'bg-orange-600/40 border-orange-500' : 'bg-orange-900/20 border-orange-800 hover:bg-orange-900/40 hover:border-orange-500'}
+      `}
+    >
+      <span className="text-base">🤬</span>
+      <span className="text-[9px] font-semibold text-orange-300 text-center leading-tight">{t('btnEnrage')}</span>
+    </button>
+
+    <button
+      type="button"
+      onClick={() => onIntervention('confuse')}
+      className={`flex flex-col items-center justify-center p-2 rounded-lg border transition-all active:scale-95
+        ${pendingIntervention === 'confuse' ? 'bg-purple-600/40 border-purple-500' : 'bg-purple-900/20 border-purple-800 hover:bg-purple-900/40 hover:border-purple-500'}
+      `}
+    >
+      <span className="text-base">🤡</span>
+      <span className="text-[9px] font-semibold text-purple-300 text-center leading-tight">{t('btnConfuse')}</span>
+    </button>
+
+    <button
+      type="button"
+      onClick={() => onIntervention('chaos')}
+      className={`flex flex-col items-center justify-center p-2 rounded-lg border transition-all active:scale-95
+        ${pendingIntervention === 'chaos' ? 'bg-blue-600/40 border-blue-500' : 'bg-blue-900/20 border-blue-800 hover:bg-blue-900/40 hover:border-blue-500'}
+      `}
+    >
+      <span className="text-base">🌀</span>
+      <span className="text-[9px] font-semibold text-blue-300 text-center leading-tight">{t('btnChaos')}</span>
+    </button>
+  </div>
+);
 
 export const ArenaScreen: React.FC<Props> = ({ config, onExit }) => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -18,6 +79,7 @@ export const ArenaScreen: React.FC<Props> = ({ config, onExit }) => {
   // START TURN WITH AI2 (Blue) as requested
   const [currentTurnId, setCurrentTurnId] = useState<'ai1' | 'ai2'>('ai2');
   const [showWinnerSelection, setShowWinnerSelection] = useState(false);
+  const [userInput, setUserInput] = useState('');
   
   // Director Mode State
   const [pendingIntervention, setPendingIntervention] = useState<InterventionType>(null);
@@ -45,6 +107,7 @@ export const ArenaScreen: React.FC<Props> = ({ config, onExit }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<number | null>(null);
+  const messagesRef = useRef<Message[]>([]);
 
   // Initialize
   useEffect(() => {
@@ -71,6 +134,10 @@ export const ArenaScreen: React.FC<Props> = ({ config, onExit }) => {
       scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
     }
   }, [messages.length]); 
+
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
 
   // --- TTS LOGIC ---
   const speakText = (text: string, characterId: 'ai1' | 'ai2' | 'system') => {
@@ -185,7 +252,7 @@ export const ArenaScreen: React.FC<Props> = ({ config, onExit }) => {
       }
 
       // 6. API Call
-      const validHistory = messages.filter(m => !m.isThinking);
+      const validHistory = messagesRef.current.filter(m => !m.isThinking);
       const responseText = await fetchAIResponse(
         speaker,
         opponent,
@@ -225,12 +292,12 @@ export const ArenaScreen: React.FC<Props> = ({ config, onExit }) => {
       }, readTimeMs);
     };
 
-    const lastMsg = messages[messages.length - 1];
+    const lastMsg = messagesRef.current[messagesRef.current.length - 1];
     if (lastMsg?.isThinking) return; 
 
     // Initial delay before turn (handled by the readTimeMs in previous loop for subsequent turns)
     // This is mostly for the very first turn
-    if (messages.length === 1) { // Only system message
+    if (messagesRef.current.length === 1) { // Only system message
         timeoutRef.current = window.setTimeout(() => {
             processTurn();
         }, 1000); 
@@ -310,8 +377,37 @@ export const ArenaScreen: React.FC<Props> = ({ config, onExit }) => {
     onExit(true);
   };
 
+  const submitUserMessage = () => {
+    const trimmed = userInput.trim();
+    if (!trimmed) return;
+
+    setMessages(prev => [
+      ...prev,
+      {
+        id: `user-${Date.now()}`,
+        senderId: 'user',
+        senderName: t('userName'),
+        content: trimmed,
+        timestamp: Date.now()
+      }
+    ]);
+    setUserInput('');
+  };
+
+  const handleUserSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    submitUserMessage();
+  };
+
+  const handleUserKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      submitUserMessage();
+    }
+  };
+
   return (
-    <div className="flex flex-col h-screen bg-black text-slate-100 overflow-hidden relative font-sans">
+    <div className="flex flex-col min-h-screen w-full bg-black text-slate-100 overflow-hidden relative font-sans">
       
       {/* WINNER SELECTION MODAL */}
       {showWinnerSelection && (
@@ -411,12 +507,21 @@ export const ArenaScreen: React.FC<Props> = ({ config, onExit }) => {
 
         {/* SWAPPED: AI 2 Panel (Blue/Left) */}
         <div className="hidden md:flex w-1/4 p-6 items-center justify-center z-10">
-          <CharacterCard 
-            character={config.ai2} 
-            isActive={currentTurnId === 'ai2' && (status === 'running' || isSpeaking)} 
-            align="left" 
-            language={config.language}
-          />
+          <div className="flex flex-col items-center gap-3 w-full">
+            <CharacterCard
+              character={config.ai2}
+              isActive={currentTurnId === 'ai2' && (status === 'running' || isSpeaking)}
+              align="left"
+              language={config.language}
+            />
+            <DirectorMiniControls
+              pendingIntervention={pendingIntervention}
+              onInterrupt={handleInterrupt}
+              onIntervention={handleIntervention}
+              t={t}
+              className="w-full"
+            />
+          </div>
         </div>
 
         {/* Chat Stream */}
@@ -434,64 +539,68 @@ export const ArenaScreen: React.FC<Props> = ({ config, onExit }) => {
              <div ref={messagesEndRef} />
            </div>
 
-           {/* DIRECTOR MODE CONTROLS */}
+           {/* Mobile Director Controls */}
+           <div className="md:hidden px-4 pb-3">
+             <div className="flex items-center justify-between mb-2">
+               <h4 className="text-[10px] font-black tracking-widest text-slate-500 uppercase">{t('directorMode')}</h4>
+               {pendingIntervention && <span className="text-[10px] text-yellow-500 font-bold animate-pulse">PENDING: {pendingIntervention.toUpperCase()}</span>}
+             </div>
+             <DirectorMiniControls
+               pendingIntervention={pendingIntervention}
+               onInterrupt={handleInterrupt}
+               onIntervention={handleIntervention}
+               t={t}
+             />
+           </div>
+
+           {/* USER INPUT */}
            <div className="p-4 border-t border-slate-800 bg-black/90 backdrop-blur z-20">
-             <div className="flex justify-between items-center mb-2 px-2">
-                 <h4 className="text-[10px] font-black tracking-widest text-slate-500 uppercase">{t('directorMode')}</h4>
-                 {pendingIntervention && <span className="text-[10px] text-yellow-500 font-bold animate-pulse">PENDING: {pendingIntervention.toUpperCase()}</span>}
-             </div>
-             <div className="grid grid-cols-4 gap-2 md:gap-4 max-w-4xl mx-auto">
-               
-               <button 
-                 onClick={handleInterrupt}
-                 className="flex flex-col items-center justify-center p-3 rounded-lg bg-red-900/20 border border-red-800 hover:bg-red-900/50 hover:border-red-500 transition-all active:scale-95 group"
-               >
-                 <span className="text-2xl mb-1 group-hover:scale-110 transition-transform">🛑</span>
-                 <span className="text-[10px] font-bold text-red-400">{t('btnInterrupt')}</span>
-               </button>
-
-               <button 
-                 onClick={() => handleIntervention('enrage')}
-                 className={`flex flex-col items-center justify-center p-3 rounded-lg border transition-all active:scale-95 group
-                    ${pendingIntervention === 'enrage' ? 'bg-orange-600/40 border-orange-500' : 'bg-orange-900/20 border-orange-800 hover:bg-orange-900/50 hover:border-orange-500'}
-                 `}
-               >
-                 <span className="text-2xl mb-1 group-hover:scale-110 transition-transform">🤬</span>
-                 <span className="text-[10px] font-bold text-orange-400">{t('btnEnrage')}</span>
-               </button>
-
-               <button 
-                 onClick={() => handleIntervention('confuse')}
-                 className={`flex flex-col items-center justify-center p-3 rounded-lg border transition-all active:scale-95 group
-                    ${pendingIntervention === 'confuse' ? 'bg-purple-600/40 border-purple-500' : 'bg-purple-900/20 border-purple-800 hover:bg-purple-900/50 hover:border-purple-500'}
-                 `}
-               >
-                 <span className="text-2xl mb-1 group-hover:scale-110 transition-transform">🤡</span>
-                 <span className="text-[10px] font-bold text-purple-400">{t('btnConfuse')}</span>
-               </button>
-
-               <button 
-                 onClick={() => handleIntervention('chaos')}
-                 className={`flex flex-col items-center justify-center p-3 rounded-lg border transition-all active:scale-95 group
-                    ${pendingIntervention === 'chaos' ? 'bg-blue-600/40 border-blue-500' : 'bg-blue-900/20 border-blue-800 hover:bg-blue-900/50 hover:border-blue-500'}
-                 `}
-               >
-                 <span className="text-2xl mb-1 group-hover:scale-110 transition-transform">🌀</span>
-                 <span className="text-[10px] font-bold text-blue-400">{t('btnChaos')}</span>
-               </button>
-
-             </div>
+             <form onSubmit={handleUserSubmit} className="flex flex-col gap-3 max-w-4xl mx-auto">
+               <div className="flex items-center justify-between">
+                 <label htmlFor="user-message" className="text-[10px] font-black tracking-widest text-slate-500 uppercase">
+                   {t('joinDebate')}
+                 </label>
+                 <span className="text-[10px] text-slate-600">{t('enterToSend')}</span>
+               </div>
+               <div className="flex items-end gap-3">
+                 <textarea
+                   id="user-message"
+                   value={userInput}
+                   onChange={(event) => setUserInput(event.target.value)}
+                   onKeyDown={handleUserKeyDown}
+                   rows={2}
+                   placeholder={t('chatPlaceholder')}
+                   className="flex-1 resize-none rounded-xl bg-slate-900/80 border border-slate-700 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-600/60"
+                 />
+                 <button
+                   type="submit"
+                   disabled={!userInput.trim()}
+                   className="px-4 py-3 rounded-xl bg-blue-600 text-white text-xs font-bold uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed hover:bg-blue-500 transition"
+                 >
+                   {t('sendMessage')}
+                 </button>
+               </div>
+             </form>
            </div>
         </div>
 
         {/* SWAPPED: AI 1 Panel (Red/Right) */}
         <div className="hidden md:flex w-1/4 p-6 items-center justify-center z-10">
-          <CharacterCard 
-            character={config.ai1} 
-            isActive={currentTurnId === 'ai1' && (status === 'running' || isSpeaking)} 
-            align="right" 
-            language={config.language}
-          />
+          <div className="flex flex-col items-center gap-3 w-full">
+            <CharacterCard
+              character={config.ai1}
+              isActive={currentTurnId === 'ai1' && (status === 'running' || isSpeaking)}
+              align="right"
+              language={config.language}
+            />
+            <DirectorMiniControls
+              pendingIntervention={pendingIntervention}
+              onInterrupt={handleInterrupt}
+              onIntervention={handleIntervention}
+              t={t}
+              className="w-full"
+            />
+          </div>
         </div>
 
       </div>
