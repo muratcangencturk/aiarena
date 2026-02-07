@@ -23,7 +23,7 @@ export const ChatMessage: React.FC<Props> = ({ message, ai1, ai2, language }) =>
   useEffect(() => {
     // If it's a system message, thinking, or user message (optional), show immediately
     // Or if the component is mounting with an OLD message (from history), show immediately
-    if (isSystem || message.isThinking) {
+    if (isSystem || isUser || message.isThinking) {
       setDisplayedContent(message.content);
       setIsTyping(false);
       return;
