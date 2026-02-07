@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { SetupScreen } from './components/SetupScreen';
 import { ArenaScreen } from './components/ArenaScreen';
 import { DebateConfig } from './types';
-import { DEFAULT_API_KEY } from './constants';
 
 const App: React.FC = () => {
   const [debateConfig, setDebateConfig] = useState<DebateConfig | null>(null);
@@ -26,7 +25,7 @@ const App: React.FC = () => {
   return (
     <>
       {!debateConfig ? (
-        <SetupScreen onStart={handleStart} initialApiKey={DEFAULT_API_KEY} />
+        <SetupScreen onStart={handleStart} />
       ) : (
         <ArenaScreen config={debateConfig} onExit={handleExit} />
       )}

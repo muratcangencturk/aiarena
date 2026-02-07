@@ -1,4 +1,4 @@
-import { API_URL, DEFAULT_MODEL, DEBATE_TACTICS, getRandomElement } from "../constants";
+import { DEFAULT_MODEL, DEBATE_TACTICS, getRandomElement } from "../constants";
 import { AICharacter, Message, OpenRouterResponse } from "../types";
 
 // OPTIMIZATION: Reduced from 8 to 4. 
@@ -107,7 +107,6 @@ export const fetchAIResponse = async (
   opponent: AICharacter,
   history: Message[],
   topic: string,
-  apiKey: string,
   language: string = "English",
   _fakeModelName: string = "Generic AI",
   intervention: string | null = null
@@ -153,12 +152,9 @@ export const fetchAIResponse = async (
   
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
-      const response = await fetch(API_URL, {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${apiKey}`,
-          "HTTP-Referer": "https://ai-arena-app.com", 
-          "X-Title": "AI Arena",
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
