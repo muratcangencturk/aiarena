@@ -517,6 +517,7 @@ export const ArenaScreen: React.FC<Props> = ({ config, onExit }) => {
               isActive={currentTurnId === 'ai2' && (status === 'running' || isSpeaking)}
               align="left"
               language={config.language}
+              modelName={config.model2}
             />
             <DirectorMiniControls
               pendingIntervention={pendingIntervention}
@@ -596,6 +597,7 @@ export const ArenaScreen: React.FC<Props> = ({ config, onExit }) => {
               isActive={currentTurnId === 'ai1' && (status === 'running' || isSpeaking)}
               align="right"
               language={config.language}
+              modelName={config.model1}
             />
             <DirectorMiniControls
               pendingIntervention={pendingIntervention}
