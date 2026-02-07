@@ -32,42 +32,42 @@ const DirectorMiniControls: React.FC<DirectorMiniControlsProps> = ({
     <button
       type="button"
       onClick={onInterrupt}
+      aria-pressed={false}
       className="flex flex-col items-center justify-center p-2 rounded-lg bg-red-900/20 border border-red-800 hover:bg-red-900/40 hover:border-red-500 transition-all active:scale-95"
     >
-      <span className="text-base">🛑</span>
       <span className="text-[9px] font-semibold text-red-300 text-center leading-tight">{t('btnInterrupt')}</span>
     </button>
 
     <button
       type="button"
       onClick={() => onIntervention('enrage')}
+      aria-pressed={pendingIntervention === 'enrage'}
       className={`flex flex-col items-center justify-center p-2 rounded-lg border transition-all active:scale-95
         ${pendingIntervention === 'enrage' ? 'bg-orange-600/40 border-orange-500' : 'bg-orange-900/20 border-orange-800 hover:bg-orange-900/40 hover:border-orange-500'}
       `}
     >
-      <span className="text-base">🤬</span>
       <span className="text-[9px] font-semibold text-orange-300 text-center leading-tight">{t('btnEnrage')}</span>
     </button>
 
     <button
       type="button"
       onClick={() => onIntervention('confuse')}
+      aria-pressed={pendingIntervention === 'confuse'}
       className={`flex flex-col items-center justify-center p-2 rounded-lg border transition-all active:scale-95
         ${pendingIntervention === 'confuse' ? 'bg-purple-600/40 border-purple-500' : 'bg-purple-900/20 border-purple-800 hover:bg-purple-900/40 hover:border-purple-500'}
       `}
     >
-      <span className="text-base">🤡</span>
       <span className="text-[9px] font-semibold text-purple-300 text-center leading-tight">{t('btnConfuse')}</span>
     </button>
 
     <button
       type="button"
       onClick={() => onIntervention('chaos')}
+      aria-pressed={pendingIntervention === 'chaos'}
       className={`flex flex-col items-center justify-center p-2 rounded-lg border transition-all active:scale-95
         ${pendingIntervention === 'chaos' ? 'bg-blue-600/40 border-blue-500' : 'bg-blue-900/20 border-blue-800 hover:bg-blue-900/40 hover:border-blue-500'}
       `}
     >
-      <span className="text-base">🌀</span>
       <span className="text-[9px] font-semibold text-blue-300 text-center leading-tight">{t('btnChaos')}</span>
     </button>
   </div>
@@ -421,7 +421,9 @@ export const ArenaScreen: React.FC<Props> = ({ config, onExit }) => {
                 onClick={() => handleWinnerSelection('ai2')}
                 className="w-full p-4 rounded-xl bg-blue-900/40 border border-blue-600/50 hover:bg-blue-800 hover:border-blue-500 transition-all flex items-center justify-between group"
               >
-                 <span className="font-bold text-blue-300 group-hover:text-white">{config.ai2.name}</span>
+                 <span className="font-bold text-blue-300 group-hover:text-white">
+                   {config.ai2.name} <span className="text-blue-400/80">({config.model2})</span>
+                 </span>
                  <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-xs">VS</div>
               </button>
 
@@ -429,7 +431,9 @@ export const ArenaScreen: React.FC<Props> = ({ config, onExit }) => {
                 onClick={() => handleWinnerSelection('ai1')}
                 className="w-full p-4 rounded-xl bg-red-900/40 border border-red-600/50 hover:bg-red-800 hover:border-red-500 transition-all flex items-center justify-between group"
               >
-                 <span className="font-bold text-red-300 group-hover:text-white">{config.ai1.name}</span>
+                 <span className="font-bold text-red-300 group-hover:text-white">
+                   {config.ai1.name} <span className="text-red-400/80">({config.model1})</span>
+                 </span>
                  <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center text-xs">VS</div>
               </button>
 
