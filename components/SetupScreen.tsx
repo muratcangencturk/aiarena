@@ -223,7 +223,7 @@ export const SetupScreen: React.FC<Props> = ({ onStart }) => {
   };
 
   return (
-    <div className="min-h-screen w-screen flex items-center justify-center p-4 bg-arena-dark font-sans relative">
+    <div className="min-h-screen w-screen flex items-stretch justify-center bg-arena-dark font-sans relative">
       
       {/* PRESET SELECTION MODAL */}
       {activeModal !== 'none' && (
@@ -269,7 +269,7 @@ export const SetupScreen: React.FC<Props> = ({ onStart }) => {
         </div>
       )}
 
-      <div className="w-full max-w-6xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[calc(100vh-2rem)]">
+      <div className="w-full h-full bg-slate-900 border-0 rounded-none shadow-2xl overflow-hidden flex flex-col md:flex-row">
         
         {/* Sidebar / Settings */}
         <div className="w-full md:w-1/4 bg-slate-950 p-6 flex flex-col gap-4 border-r border-slate-800 overflow-y-auto">
