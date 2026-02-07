@@ -191,7 +191,6 @@ export const ArenaScreen: React.FC<Props> = ({ config, onExit }) => {
         opponent,
         validHistory,
         config.topic,
-        config.apiKey,
         config.language,
         currentModelName,
         interventionPrompt
