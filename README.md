@@ -19,17 +19,15 @@ View your app in AI Studio: https://ai.studio/apps/drive/1LXR4sD42ADimkewAfKhAU0
 3. Run the app:
    `npm run dev`
 
-## Deploy on Cloudflare (Wrangler)
+## Deploy on Cloudflare Pages (recommended)
 
-This app uses a Cloudflare Worker to keep your API key private. The browser calls `/api/chat`, and the
-worker injects the secret server-side so the key is never shipped to clients. Static assets are served
-from `dist` via the Worker Assets binding.
+This app uses a Cloudflare Pages Function to keep your API key private. The browser calls `/api/chat`, and the
+function injects the secret server-side so the key is never shipped to clients.
 
-1. Build the app:
-   `npm run build`
-2. Set the secret:
-   `npx wrangler secret put OPENROUTER_API_KEY`
-3. Deploy:
-   `npx wrangler deploy`
+1. Create a Cloudflare Pages project connected to this repo.
+2. Set the build command to `npm run build` and the build output directory to `dist`.
+3. In **Project Settings → Environment Variables**, add:
+   - `OPENROUTER_API_KEY` (your OpenRouter API key)
+4. Deploy.
 
-> Local dev (requires Wrangler): `npx wrangler dev -- npm run dev`
+> Optional local Pages dev (requires Wrangler): `npx wrangler pages dev --proxy 3000 -- npm run dev`
