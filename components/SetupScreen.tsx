@@ -9,7 +9,6 @@ import { getTranslation } from '../translations';
 
 interface Props {
   onStart: (config: DebateConfig) => void;
-  initialApiKey: string;
 }
 
 const emptyCharacter = (id: 'ai1' | 'ai2', color: string): AICharacter => ({
@@ -65,7 +64,7 @@ const ChipSelector = ({
 };
 
 
-export const SetupScreen: React.FC<Props> = ({ onStart, initialApiKey }) => {
+export const SetupScreen: React.FC<Props> = ({ onStart }) => {
   const [mode, setMode] = useState<'quick' | 'custom' | 'random'>('quick');
   const [topic, setTopic] = useState('');
   const [language, setLanguage] = useState('English');
@@ -144,7 +143,6 @@ export const SetupScreen: React.FC<Props> = ({ onStart, initialApiKey }) => {
       topic: tTopic, 
       ai1: c1, 
       ai2: c2, 
-      apiKey: initialApiKey, 
       language, 
       model1: getFinalModel(model1),
       model2: getFinalModel(model2)
@@ -208,7 +206,6 @@ export const SetupScreen: React.FC<Props> = ({ onStart, initialApiKey }) => {
       topic, 
       ai1, 
       ai2, 
-      apiKey: initialApiKey, 
       language, 
       model1: getFinalModel(model1),
       model2: getFinalModel(model2)

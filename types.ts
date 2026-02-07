@@ -25,7 +25,6 @@ export interface DebateConfig {
   topic: string;
   ai1: AICharacter;
   ai2: AICharacter;
-  apiKey: string;
   language: string;
   model1: string; // The "Fake" model name for AI 1
   model2: string; // The "Fake" model name for AI 2

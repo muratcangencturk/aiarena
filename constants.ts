@@ -1,10 +1,7 @@
 import { AICharacter, Role, Tone } from "./types";
 
-export const DEFAULT_API_KEY = "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";
-
 // Updated to the specific Qwen 3 Next model requested by user
 export const DEFAULT_MODEL = "qwen/qwen3-next-80b-a3b-instruct:free"; 
-export const API_URL = "https://openrouter.ai/api/v1/chat/completions";
 
 export const DEBATE_TACTICS = [
   "Use a vivid analogy to explain why the opponent is wrong.",
