@@ -7,9 +7,10 @@ interface Props {
   isActive: boolean;
   align: 'left' | 'right';
   language: string;
+  modelName?: string;
 }
 
-export const CharacterCard: React.FC<Props> = ({ character, isActive, align, language }) => {
+export const CharacterCard: React.FC<Props> = ({ character, isActive, align, language, modelName }) => {
   const isLeft = align === 'left';
   const t = (key: string) => getTranslation(language, key);
   
@@ -41,7 +42,10 @@ export const CharacterCard: React.FC<Props> = ({ character, isActive, align, lan
       </div>
 
       {/* Name */}
-      <h2 className="text-2xl font-black text-white truncate max-w-full tracking-tight mb-1">{character.name}</h2>
+      <h2 className="text-2xl font-black text-white truncate max-w-full tracking-tight mb-1">
+        {character.name}
+        {modelName ? <span className="text-xs font-semibold text-slate-400 ml-2">({modelName})</span> : null}
+      </h2>
       
       {/* Role / Stance Box (Neutral) */}
       <div className={`text-xs font-bold uppercase tracking-widest mb-3 px-3 py-1 rounded border ${roleColor} w-full text-center shadow-inner`}>
@@ -50,13 +54,13 @@ export const CharacterCard: React.FC<Props> = ({ character, isActive, align, lan
 
       {/* Stats */}
       <div className={`w-full mt-1 pt-3 border-t border-white/10 text-xs space-y-1.5 text-slate-400 ${isLeft ? 'text-left' : 'text-right'}`}>
-         <div className="flex justify-between items-center gap-2">
-            <span className="text-slate-500 font-bold uppercase text-[10px]">{t('tone')}</span>
-            <span className="text-slate-200 font-medium truncate">{character.tone}</span>
+         <div className={`flex items-center gap-2 ${isLeft ? 'justify-between' : 'flex-row-reverse justify-between'}`}>
+            <span className={`text-slate-500 font-bold uppercase text-[10px] ${isLeft ? 'text-left' : 'text-right'}`}>{t('tone')}</span>
+            <span className={`text-slate-200 font-medium truncate ${isLeft ? 'text-right' : 'text-left'}`}>{character.tone}</span>
          </div>
-         <div className="flex justify-between items-center gap-2">
-            <span className="text-slate-500 font-bold uppercase text-[10px]">{t('traits')}</span>
-            <span className="text-slate-400 text-[10px] truncate max-w-[80px]">{character.traits.split(',')[0]}</span>
+         <div className={`flex items-center gap-2 ${isLeft ? 'justify-between' : 'flex-row-reverse justify-between'}`}>
+            <span className={`text-slate-500 font-bold uppercase text-[10px] ${isLeft ? 'text-left' : 'text-right'}`}>{t('traits')}</span>
+            <span className={`text-slate-400 text-[10px] truncate max-w-[90px] ${isLeft ? 'text-right' : 'text-left'}`}>{character.traits.split(',')[0]}</span>
          </div>
       </div>
     </div>
