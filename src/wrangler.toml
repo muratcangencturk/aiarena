@@ -1,0 +1,7 @@
+name = "ai-arena"
+compatibility_date = "2026-02-07"
+main = "index.ts"
+
+[assets]
+directory = "../dist"
+binding = "ASSETS"

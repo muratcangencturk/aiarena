@@ -31,3 +31,10 @@ function injects the secret server-side so the key is never shipped to clients.
 4. Deploy.
 
 > Optional local Pages dev (requires Wrangler): `npx wrangler pages dev --proxy 3000 -- npm run dev`
+
+## Deploy on Cloudflare Workers (alternative)
+
+If you are deploying with `wrangler deploy`, make sure Wrangler can find a config file in the directory it runs
+from. This repo includes configs at the repo root and under `src/` so it works even if your Cloudflare project
+root is set to `./src`. If you run Wrangler from another directory, pass the config explicitly, for example:
+`npx wrangler deploy --config ./wrangler.toml`.
