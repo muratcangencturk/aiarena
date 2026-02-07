@@ -223,7 +223,7 @@ export const SetupScreen: React.FC<Props> = ({ onStart }) => {
   };
 
   return (
-    <div className="min-h-screen w-screen flex items-stretch justify-center bg-arena-dark font-sans relative">
+    <div className="h-screen w-screen flex items-stretch justify-center bg-arena-dark font-sans relative overflow-hidden">
       
       {/* PRESET SELECTION MODAL */}
       {activeModal !== 'none' && (
