@@ -15,6 +15,19 @@ View your app in AI Studio: https://ai.studio/apps/drive/1LXR4sD42ADimkewAfKhAU0
 
 1. Install dependencies:
    `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+2. Create a `.env.local` file (based on `.env.example`) and set `OPENROUTER_API_KEY` to your OpenRouter API key.
 3. Run the app:
    `npm run dev`
+
+## Deploy on Cloudflare Pages (recommended)
+
+This app uses a Cloudflare Pages Function to keep your API key private. The browser calls `/api/chat`, and the
+function injects the secret server-side so the key is never shipped to clients.
+
+1. Create a Cloudflare Pages project connected to this repo.
+2. Set the build command to `npm run build` and the build output directory to `dist`.
+3. In **Project Settings → Environment Variables**, add:
+   - `OPENROUTER_API_KEY` (your OpenRouter API key)
+4. Deploy.
+
+> Optional local Pages dev (requires Wrangler): `npx wrangler pages dev --proxy 3000 -- npm run dev`
